@@ -5,6 +5,20 @@ $(function () {
   // Display the current date in the header of the page
   var currentDayEl = $("#currentDay");
   var currentDay = dayjs().format("dddd, MMMM D");
+
+  // Handle ordinal based on the day of the month
+  var dayOfMonth = dayjs().format("D");
+
+  if (["1","21","31"].includes(dayOfMonth)) {
+    currentDay += "st"; // Add 'st' to the end of the string on the 1st, 21st, or 31st of the month
+  } else if (["2","22"].includes(dayOfMonth)) {
+    currentDay += "nd"; // Add 'nd' to the end of the string on the 2nd, 22nd of the month
+  } else if (["3","23"].includes(dayOfMonth)) {
+    currentDay += "rd"; // Add 'rd' to the end of the string on the 3rd, 23rd of the month
+  } else {
+    currentDay += "th"; // // Add 'th' to the end of the string on all other days
+  }
+
   currentDayEl.text(currentDay);
 
   // Generate time slots as HTML elements
