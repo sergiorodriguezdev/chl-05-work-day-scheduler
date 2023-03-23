@@ -1,12 +1,8 @@
-// var arrScheduleItems = [];
-// var todaySchedule = {
-//   date: dayjs().format("MM/DD/YYYY")
-// };
-
 // Wrap all code that interacts with the DOM in a call to jQuery to ensure that
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
 $(function () {
+  
   // Display the current date in the header of the page
   var currentDayEl = $("#currentDay");
   var currentDay = dayjs().format("dddd, MMMM D");
@@ -36,9 +32,7 @@ $(function () {
   // Add on click listener
   containerEl.on("click", ".saveBtn", saveScheduleItems);
 
-  // TODO: Add code to get any user input that was saved in localStorage and set
-  // the values of the corresponding textarea elements. HINT: How can the id
-  // attribute of each time-block be used to do this?
+  // Retrive data from localStorage and print to page
   printData();
 
 });
@@ -128,6 +122,7 @@ function getBackgroundColorClass(timeSlotId) {
 }
 
 // This function handles on click events for Save button for each time slot
+// Data is saved to localStorage
 function saveScheduleItems(event) {
 
   // Grab the Save button instance
@@ -146,5 +141,25 @@ function saveScheduleItems(event) {
   // Use the time slot id (hour-x) value as the key
   // Use the Description textarea value as the value (trim whitespace)
   localStorage.setItem(timeSlotId, textAreaDescription.value.trim());
+
+}
+
+// This function will load the data from the localStorage
+function printData() {
+
+  // Grab main container
+  var containerEl = $(".container-lg");
+
+  var timeSlots = containerEl.children(".row");
+
+  for (var i = 0; i < timeSlots.length; i++) {
+
+    var timeSlotId = timeSlots[i].id;
+
+    var textAreaDescription = $(timeSlots[i]).children(".description")[0];
+
+    textAreaDescription.value = localStorage.getItem(timeSlotId);
+  }
+
 
 }
