@@ -2,94 +2,108 @@
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
 $(function () {
+  // Display the current date in the header of the page
+  var currentDayEl = $("#currentDay");
+  var currentDay = dayjs().format("dddd, MMMM D");
+  currentDayEl.text(currentDay);
+
+  // Generate time slots as HTML elements
+  // This will also apply the correct class to each time slot (past/present/future)
+  createHTML();
+  
   // TODO: Add a listener for click events on the save button. This code should
   // use the id in the containing time-block as a key to save the user input in
   // local storage. HINT: What does `this` reference in the click listener
   // function? How can DOM traversal be used to get the "hour-x" id of the
   // time-block containing the button that was clicked? How might the id be
   // useful when saving the description in local storage?
-  
-  // TODO: Add code to apply the past, present, or future class to each time
-  // block by comparing the id to the current hour. HINTS: How can the id
-  // attribute of each time-block be used to conditionally add or remove the
-  // past, present, and future classes? How can Day.js be used to get the
-  // current hour in 24-hour time?
-  createHTML();
-  var containerEl = $("#schedule");
-
-  var timeSlots = containerEl.children();
-
-  for (var i = 0; i < timeSlots.length; i++) {
-    var timeSlot = $(timeSlots[i]); // Get the individual tie slot - it's an array with a single element
-    var timeSlotId = timeSlot[0].id; // Get the id attribute for the DIV time slot element
-    var hourNow = dayjs().format("H");
-
-    if(timeSlotId === "hour-" + hourNow) {
-      timeSlot.addClass("present");
-    } else if (parseInt(timeSlotId.split("-")[1]) < parseInt(hourNow)) {
-      timeSlot.addClass("past");
-      console.log(timeSlotId.split("-")[1]);
-    } else {
-      timeSlot.addClass("future");
-    }
-  }
 
   // TODO: Add code to get any user input that was saved in localStorage and set
   // the values of the corresponding textarea elements. HINT: How can the id
   // attribute of each time-block be used to do this?
-  //
-  // TODO: Add code to display the current date in the header of the page.
 
-  var currentDayEl = $("#currentDay");
-  var currentDay = dayjs().format("dddd, MMMM D");
-  currentDayEl.text(currentDay);
 });
 
-
+// This function will create the HTML structure for each of the time slots from 9AM to 5PM
+/*
+  EXAMPLE
+  <div id="hour-13" class="row time-block">
+    <div class="col-2 col-md-1 hour text-center py-3">1PM</div>
+    <textarea class="col-8 col-md-10 description" rows="3"> </textarea>
+    <button class="btn saveBtn col-2 col-md-1" aria-label="save">
+      <i class="fas fa-save" aria-hidden="true"></i>
+    </button>
+  </div>
+*/
 function createHTML() {
+
+  // Grab main container
   var containerEl = $("#schedule");
 
+  // Create time slot DIVs - start at 9 (aka 9AM) and end with 17 (aka 5PM)
   for (var i = 9; i < 18; i++) {
 
-    // <div id="hour-12" class="row time-block"></div>
+    // Create <div id="hour-12" class="row time-block"></div>
     var divTimeSlot = $("<div>");
     divTimeSlot.attr("id", "hour-" + i);
     divTimeSlot.addClass("row time-block");
 
-    // <div class="col-2 col-md-1 hour text-center py-3">
+    // Add past/present/future class to time slot DIV
+    var backgroundColorClass = getBackgroundColorClass(divTimeSlot.attr("id"));
+    divTimeSlot.addClass(backgroundColorClass);
+
+    // Create <div class="col-2 col-md-1 hour text-center py-3">
     var divHour = $("<div>");
     divHour.addClass("col-2 col-md-1 hour text-center py-3");
-    var txtHour = (i % 12 === 0) ? 12 : i % 12; // if i % 12 is 0 then set text to 12, otherwise set it to i % 12
-    txtHour = (i < 12) ? txtHour + "AM" : txtHour + "PM";
+    var txtHour = (i % 12 === 0) ? 12 : i % 12; // If i % 12 is 0 then set text to 12, otherwise set it to i % 12
+    txtHour = (i < 12) ? txtHour + "AM" : txtHour + "PM"; // Add AM or PM to text depending on i counter
     divHour.text(txtHour);
-    divTimeSlot.append(divHour);
+    divTimeSlot.append(divHour); // Append hour DIV element to parent (time slot DIV)
 
-    // <textarea class="col-8 col-md-10 description" rows="3">
+    // Create <textarea class="col-8 col-md-10 description" rows="3">
     var textAreaDescription = $("<textarea>");
     textAreaDescription.attr("rows", "3");
     textAreaDescription.addClass("col-8 col-md-10 description");
-    divTimeSlot.append(textAreaDescription);
+    divTimeSlot.append(textAreaDescription); // Append description textarea element to parent (time slot DIV)
 
-    // <button class="btn saveBtn col-2 col-md-1" aria-label="save">
+    // Create <button class="btn saveBtn col-2 col-md-1" aria-label="save">
     var btnSave = $("<button>");
     btnSave.attr("aria-label","save");
     btnSave.addClass("btn saveBtn col-2 col-md-1");
 
-    // <i class="fas fa-save" aria-hidden="true">
+    // Create <i class="fas fa-save" aria-hidden="true">
     var iSave = $("<i>");
     iSave.attr("aria-hidden","true");
-    iSave.addClass("fas fa-save");
+    iSave.addClass("fas fa-save"); 
 
-    btnSave.append(iSave);
-    divTimeSlot.append(btnSave);
+    btnSave.append(iSave); // Append save i element to parent (save button)
+    divTimeSlot.append(btnSave); // Append save button element to parent (time slot DIV)
 
-    containerEl.append(divTimeSlot);
+    containerEl.append(divTimeSlot); // Append time slot DIV element to parent (main container)
   }
 }
-/* <div id="hour-12" class="row time-block future">
-  <div class="col-2 col-md-1 hour text-center py-3">11AM</div>
-  <textarea class="col-8 col-md-10 description" rows="3"> </textarea>
-  <button class="btn saveBtn col-2 col-md-1" aria-label="save">
-    <i class="fas fa-save" aria-hidden="true"></i>
-  </button>
-</div> */
+
+// This function returns the past/present/future class name based on the time slot id
+function getBackgroundColorClass(timeSlotId) {
+
+  // Grab the hour value from the id which is in the following format: hour-A
+  // Split the id string at the hyphen and return the second element of the resulting array (the hour)
+  var timeSlotHour = timeSlotId.split("-")[1];
+  timeSlotHour = parseInt(timeSlotHour); // Convert variable to a number
+
+  // Grab the current time hour value in 24-hour format
+  var nowHour = dayjs().format("H");
+  nowHour = parseInt(nowHour); // Convert variable to a number
+
+  // If the time slot hour is the same as the hour now then return the class name "present"
+  // If the time slot hour is less than the hour now then return the class name "past"
+  // Else return the class name "future"
+  if(timeSlotHour === nowHour) {
+    return "present";
+  } else if (timeSlotHour < nowHour) {
+    return "past";
+  } else {
+    return "future"
+  }
+
+}
