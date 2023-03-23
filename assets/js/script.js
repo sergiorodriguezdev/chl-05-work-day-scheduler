@@ -39,6 +39,7 @@ $(function () {
   // TODO: Add code to get any user input that was saved in localStorage and set
   // the values of the corresponding textarea elements. HINT: How can the id
   // attribute of each time-block be used to do this?
+  printData();
 
 });
 
@@ -126,14 +127,24 @@ function getBackgroundColorClass(timeSlotId) {
 
 }
 
+// This function handles on click events for Save button for each time slot
 function saveScheduleItems(event) {
 
+  // Grab the Save button instance
   var saveBtn = $(this);
+
+  // Grab the button's parent (time slot DIV)
   var saveBtnParent = saveBtn.parent(".row");
   
+  // Grab the time slot id attribute value (hour-x)
   var timeSlotId = saveBtnParent.attr("id");
+
+  // Grab the Description textarea instance
   var textAreaDescription = saveBtnParent.children(".description")[0];
 
+  // Save data to localStorage
+  // Use the time slot id (hour-x) value as the key
+  // Use the Description textarea value as the value (trim whitespace)
   localStorage.setItem(timeSlotId, textAreaDescription.value.trim());
 
 }
