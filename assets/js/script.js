@@ -2,7 +2,7 @@
 // the code isn't run until the browser has finished rendering all the elements
 // in the html.
 $(function () {
-  
+
   // Display the current date in the header of the page
   var currentDayEl = $("#currentDay");
   var currentDay = dayjs().format("dddd, MMMM D");
@@ -17,9 +17,10 @@ $(function () {
   } else if (["3","23"].includes(dayOfMonth)) {
     currentDay += "rd"; // Add 'rd' to the end of the string on the 3rd, 23rd of the month
   } else {
-    currentDay += "th"; // // Add 'th' to the end of the string on all other days
+    currentDay += "th"; // Add 'th' to the end of the string on all other days
   }
 
+  // Set text property
   currentDayEl.text(currentDay);
 
   // Generate time slots as HTML elements
@@ -99,8 +100,8 @@ function createHTML() {
 // This function returns the past/present/future class name based on the time slot id
 function getBackgroundColorClass(timeSlotId) {
 
-  // Grab the hour value from the id which is in the following format: hour-A
-  // Split the id string at the hyphen and return the second element of the resulting array (the hour)
+  // Grab the hour value from the id which is in the following format: hour-x
+  // Split the id string at the hyphen and return the second element of the resulting array (the hour value)
   var timeSlotHour = timeSlotId.split("-")[1];
   timeSlotHour = parseInt(timeSlotHour); // Convert variable to a number
 
@@ -135,12 +136,16 @@ function saveScheduleItems(event) {
   var timeSlotId = saveBtnParent.attr("id");
 
   // Grab the Description textarea instance
-  var textAreaDescription = saveBtnParent.children(".description")[0];
+  var textAreaDescription = $(saveBtnParent.children(".description")[0]);
+  var descriptionText = textAreaDescription.val().trim();
 
   // Save data to localStorage
   // Use the time slot id (hour-x) value as the key
-  // Use the Description textarea value as the value (trim whitespace)
-  localStorage.setItem(timeSlotId, textAreaDescription.value.trim());
+  // Use the Description textarea value as the value (trimmed)
+  localStorage.setItem(timeSlotId, descriptionText);
+  
+  // Reload textarea value to use trimmed value
+  textAreaDescription.val(descriptionText);
 
 }
 
@@ -150,16 +155,21 @@ function printData() {
   // Grab main container
   var containerEl = $(".container-lg");
 
+  // Grab array of time slot DIV elements
   var timeSlots = containerEl.children(".row");
 
+  // For each time slot DIV, capture its 'id' value
+  // Then, grab an instance of the child textarea element based on the 'description' class (use array element at 0)
+  // Set the textarea element value to the value stored in localStorage whose key is the time slot element ID
   for (var i = 0; i < timeSlots.length; i++) {
 
     var timeSlotId = timeSlots[i].id;
 
     var textAreaDescription = $(timeSlots[i]).children(".description")[0];
-
-    textAreaDescription.value = localStorage.getItem(timeSlotId);
+    // Added line below to convert to jQuery element
+    textAreaDescription = $(textAreaDescription);
+    
+    textAreaDescription.val(localStorage.getItem(timeSlotId));
   }
-
 
 }
